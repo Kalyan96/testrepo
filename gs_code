@@ -1,0 +1,102 @@
+
+ // Your Telegram chat ID
+  var chatId = "5998718697";
+  // Your Telegram Bot API Endpoint
+  var telegramBotAPI = "https://api.telegram.org/bot5998718697:AAGFmRh0tmwy10WUmuDCEOKThIa0ChWI0W4/sendMessage";
+
+function sendMessageToTelegram() {
+  // Your Telegram chat ID
+  var chatId = "6020027159";
+  // Your Telegram Bot API Endpoint
+  var telegramBotAPI = "https://api.telegram.org/bot5998718697:AAGFmRh0tmwy10WUmuDCEOKThIa0ChWI0W4/sendMessage";
+
+  // Get the active sheet
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  // Get the range of cells containing the timings (assuming they are in column A)
+  var timingsRange = sheet.getRange("A:A");
+
+  // Get the values in the timings range
+  var timings = timingsRange.getValues();
+
+  // Get the current date and time
+  var now = new Date();
+
+  // Loop through the timings and check if any message needs to be sent
+  for (var i = 0; i < timings.length; i++) {
+    var timing = timings[i][0];
+
+    // Check if the timing is in the future and matches the current hour and minute
+    if (timing instanceof Date && timing.getHours() === now.getHours() && timing.getMinutes() === now.getMinutes()) {
+      // Get the corresponding message from the adjacent cell (assuming messages are in column B)
+      var message = sheet.getRange(i + 1, 2).getValue();
+      var messageId = sendMessageWithButtons(message);
+      saveMessageIdToSheet(messageId, i + 1);
+    }
+  }
+}
+
+function sendMessageWithButtons(message) {
+  // Your Telegram chat ID
+  var chatId = "6020027159";
+  // Your Telegram Bot API Endpoint
+  var telegramBotAPI = "https://api.telegram.org/bot5998718697:AAGFmRh0tmwy10WUmuDCEOKThIa0ChWI0W4/sendMessage";
+
+  var keyboard = {
+    inline_keyboard: [
+      [
+        { text: "Done", callback_data: "done" },
+        { text: "Later", callback_data: "later" }
+      ]
+    ]
+  };
+
+  var payload = {
+    chat_id: chatId,
+    text: message,
+    reply_markup: JSON.stringify(keyboard)
+  };
+
+  var response = UrlFetchApp.fetch(telegramBotAPI, {
+    method: "post",
+    payload: payload
+  });
+
+  var responseData = JSON.parse(response.getContentText());
+
+  return responseData.result.message_id;
+}
+
+function saveMessageIdToSheet(messageId, rowIndex) {
+  // Get the active sheet
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  // Set the message ID in column C at the corresponding row index
+  sheet.getRange(rowIndex, 3).setValue(messageId);
+}
+
+// Set up a time-driven trigger to execute the function every 1 minute
+function createTrigger() {
+  // Interval in minutes
+  var interval = 1; // 1 minute
+
+  // Create the time-driven trigger
+  ScriptApp.newTrigger("sendMessageToTelegram")
+    .timeBased()
+    .everyMinutes(interval)
+    .create();
+}
+
+function sendTestMessage() {
+  // Your Telegram chat ID
+  var chatId = "6020027159";
+  // Your Telegram Bot API Endpoint
+  var telegramBotAPI = "https://api.telegram.org/bot5998718697:AAGFmRh0tmwy10WUmuDCEOKThIa0ChWI0W4/sendMessage";
+
+  // Message content for the test message
+  var testMessage = "This is a test message from Google Apps Script!";
+
+  var messageId = sendMessageWithButtons(testMessage);
+  saveMessageIdToSheet(messageId, 1);
+}
+
