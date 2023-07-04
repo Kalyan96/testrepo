@@ -1,0 +1,445 @@
+//+------------------------------------------------------------------+
+
+
+extern int     My_Integer = 1;
+extern double  Double_Bubble = 2.0;
+extern bool    Bool_Linger = True;
+extern string  Say_Something = "Thing";
+
+string ip_string;
+string chart_points[][3]; // 2-dimensional dynamic array
+string last_click[2];// time-price of the last click for creation of alerts 
+MqlDateTime time_point;
+int current_shift;//the current position of the chart 
+
+int OnInit()
+  {
+   //ChartApplyTemplate(0,"Alert_modtpl");
+   ArrayResize(chart_points,1); 
+   //ArrayInitialize(a1,"");   
+   
+   //array_fill(chart_points);
+   show_2darray(chart_points);
+   
+   sym_append(chart_points,"EURAUD","13.03403","above");
+   sym_append(chart_points,"USDCAD","1.03403","below");
+   show_2darray(chart_points);
+   
+   sym_check(chart_points);
+   show_2darray(chart_points);
+
+   //MessageBox("mb1","mb caption",5);
+
+
+   
+   return(INIT_SUCCEEDED);
+  }
+
+void OnTick()
+  {
+   
+  }
+
+void show_2darray(string pass_array[][])//display 2d string array
+{
+   for (int i=ArrayRange(pass_array,0)-1; i>=0; i--)//iterating the firs Dim
+      {
+         string temp="";
+         for (int j=0; j<ArrayRange(pass_array,1); j++)//iterating the second Dim
+         {
+            //PrintFormat ("%s",chart_points[i][j]);
+            temp = temp + "<" +pass_array[i][j]+ "> ";
+         }
+         Print(temp);
+         //Print ("---------");
+      }
+    Print( IntegerToString(ArrayRange(pass_array,0))+" X "+IntegerToString(ArrayRange(pass_array,1)) );
+
+}
+
+void array_fill(string pass_array[][])//fill 2d string array with random val
+{
+   for (int i=ArrayRange(pass_array,0)-1; i>=0; i--)//iterating the firs Dim
+      {
+         string temp="";
+         for (int j=0; j<ArrayRange(pass_array,1); j++)//iterating the second Dim
+         {
+            //PrintFormat ("%s",chart_points[i][j]);
+            if (j==0)
+            pass_array[i][j] = "symbol "+i+j;
+            if (j==1)
+            pass_array[i][j] = "price "+i+j;
+            if (j==2)
+            pass_array[i][j] = "above/below "+i+j;
+         }
+         //Print(temp);
+         //Print ("---------");
+      }
+}
+
+void array_del_row(string pass_array[][], int row)//delete a row in 2d string array and rows start from 0
+{
+   for (int i=row; i<ArrayRange(pass_array,0)-1; i++)//iterating the firs Dim
+         for (int j=0; j<ArrayRange(pass_array,1); j++)//iterating the second Dim
+            pass_array[i][j]=pass_array[i+1][j];// swapping the next row with current 
+   int curr_size = ArrayRange(pass_array,0);
+   ArrayResize(pass_array,curr_size-1);// removing last row  
+}
+
+void sym_append(string pass_array[][], string sym_name, string point, string direction)//add a sybmol to 2d string array
+{
+   ArrayResize(pass_array,ArrayRange(pass_array,0)+1); 
+   pass_array[ArrayRange(pass_array,0)-1][0] = sym_name;
+   pass_array[ArrayRange(pass_array,0)-1][1] = point; 
+   pass_array[ArrayRange(pass_array,0)-1][2] = direction; 
+}
+
+void sym_check(string pass_array[][])
+{
+   string sym,dir;
+   double point;
+   for (int i=ArrayRange(pass_array,0)-1; i>=0; i--)//iterating the firs Dim
+      {
+            sym = pass_array[i][0];
+            point = StringToDouble(pass_array[i][1]);
+            dir = pass_array[i][2];
+            double curr_price = iClose(sym,PERIOD_M1,0);
+            if (dir == "above" && curr_price>=point )
+            {
+               //Print ("ALERT: price of "+sym+" going higher than "+point+" | price="+curr_price+" |" );
+               Alert ("ALERT: price of "+sym+" going higher than "+point+" | price="+curr_price+" |" );
+            }
+            else if (dir == "below" && curr_price<=point)
+            {
+               //Print ("ALERT: price of "+sym+" going lower than "+point+" | price="+curr_price+" |");
+               Alert ("ALERT: price of "+sym+" going lower than "+point+" | price="+curr_price+" |");
+            }
+            array_del_row(pass_array,i);
+
+      }
+   
+}
+
+void add_alert(string pass_array[][])
+{
+   
+}
+
+void process_ipstring(string pass_string)
+{
+   Print("the string entered = "+pass_string);
+   if (pass_string == "ALERT")
+      Print ("alert TBA");
+   else if (pass_string == "AUDCAD")
+      {
+        ChartSetSymbolPeriod(0,"AUDCAD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "AUDCHF")
+      {
+        ChartSetSymbolPeriod(0,"AUDCHF",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "AUDJPY")
+      {
+        ChartSetSymbolPeriod(0,"AUDJPY",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "AUDNZD")
+      {
+        ChartSetSymbolPeriod(0,"AUDNZD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "AUDUSD")
+      {
+        ChartSetSymbolPeriod(0,"AUDUSD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "CADJPY")
+      {
+        ChartSetSymbolPeriod(0,"CADJPY",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURAUD")
+      {
+        ChartSetSymbolPeriod(0,"EURAUD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURCAD")
+      {
+        ChartSetSymbolPeriod(0,"EURCAD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURGBP")
+      {
+        ChartSetSymbolPeriod(0,"EURGBP",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURJPY")
+      {
+        ChartSetSymbolPeriod(0,"EURJPY",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURNZD")
+      {
+        ChartSetSymbolPeriod(0,"EURNZD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "EURUSD")
+      {
+        ChartSetSymbolPeriod(0,"EURUSD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPAUD")
+      {
+        ChartSetSymbolPeriod(0,"GBPAUD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPCAD")
+      {
+        ChartSetSymbolPeriod(0,"GBPCAD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPCHF")
+      {
+        ChartSetSymbolPeriod(0,"GBPCHF",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPJPY")
+      {
+        ChartSetSymbolPeriod(0,"GBPJPY",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPNZD")
+      {
+        ChartSetSymbolPeriod(0,"GBPNZD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "GBPUSD")
+      {
+        ChartSetSymbolPeriod(0,"GBPUSD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "NZDUSD")
+      {
+        ChartSetSymbolPeriod(0,"NZDUSD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "USDCAD")
+      {
+        ChartSetSymbolPeriod(0,"USDCAD",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "USDCHF")
+      {
+        ChartSetSymbolPeriod(0,"USDCHF",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "USDJPY")
+      {
+        ChartSetSymbolPeriod(0,"USDJPY",ChartPeriod(0));//ChartApplyTemplate(0,"Alert_modtpl");
+      }
+   else if (pass_string == "num_down")// zoom out >> chart period increases
+   {
+      if(ChartPeriod(0)==PERIOD_M1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M5);
+      else if(ChartPeriod(0)==PERIOD_M5)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M15);
+      else if(ChartPeriod(0)==PERIOD_M15)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M30);
+      else if(ChartPeriod(0)==PERIOD_M30)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_H1);
+      else if(ChartPeriod(0)==PERIOD_H1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_H4);
+      else if(ChartPeriod(0)==PERIOD_H4)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_D1);
+      else if(ChartPeriod(0)==PERIOD_D1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_W1);
+      else if(ChartPeriod(0)==PERIOD_W1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_MN1);
+      else Print ("zoom period reached to max");
+      Print (ChartSymbol(0)+" chart zoomed to period "+ChartPeriod(0));
+   }
+   else if (pass_string == "num_up")// zoom in >> chart period reduces
+   {
+      if(ChartPeriod(0)==PERIOD_M5)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M1);
+      else if(ChartPeriod(0)==PERIOD_M15)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M5);
+      else if(ChartPeriod(0)==PERIOD_M30)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M15);
+      else if(ChartPeriod(0)==PERIOD_H1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_M30);
+      else if(ChartPeriod(0)==PERIOD_H4)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_H1);
+      else if(ChartPeriod(0)==PERIOD_D1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_H4);
+      else if(ChartPeriod(0)==PERIOD_W1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_D1);
+      else if(ChartPeriod(0)==PERIOD_MN1)ChartSetSymbolPeriod(0,ChartSymbol(0),PERIOD_W1);
+      else Print ("zoom period reached to least");
+      Print (ChartSymbol(0)+" chart un-zoomed to period "+ChartPeriod(0));
+   }
+   else if (pass_string == "num_left")// drag chart to left
+   {
+      datetime new_time;
+      if (last_click[0] == "")
+         new_time=Time[0];
+      else// when i have clicked on chart and wish to move as per that time only 
+      {
+         new_time=StringToTime(last_click[0]);
+      }
+      if(ip_string == "D")  new_time= time_mod(Time[current_shift],'D',"sub");
+      else if(ip_string == "H") new_time= time_mod(Time[current_shift],'H',"sub");
+      else if(ip_string == "W") new_time= time_mod(Time[current_shift],'W',"sub");
+      else if(ip_string == "M") new_time= time_mod(Time[current_shift],'M',"sub");
+      else if(ip_string == "Y") new_time= time_mod(Time[current_shift],'Y',"sub");
+      else 
+      {
+         Print("wrong string for numkey");clear_ip();
+         current_shift=0;
+      }
+      current_shift=iBarShift(NULL,PERIOD_CURRENT,new_time);
+      Print (" currnet shift= "+current_shift+" time= "+TimeToStr(Time[current_shift]));
+      ChartNavigate(0,CHART_END,-1*current_shift);
+
+   }
+   else if (pass_string == "num_right")// drag chart to left
+   {
+      datetime new_time1;
+      if (last_click[0] == "")
+         new_time1=Time[0];
+      else// when i have clicked on chart and wish to move as per that time only 
+         {
+            new_time1=StringToTime(last_click[0]);
+         }
+      if(ip_string == "D")  new_time1= time_mod(Time[current_shift],'D',"add");
+      else if(ip_string == "H") new_time1= time_mod(Time[current_shift],'H',"add");
+      else if(ip_string == "W") new_time1= time_mod(Time[current_shift],'W',"add");
+      else if(ip_string == "M") new_time1= time_mod(Time[current_shift],'M',"add");
+      else if(ip_string == "Y") new_time1= time_mod(Time[current_shift],'Y',"add");
+      else 
+      {
+         Print("wrong string for numkey");clear_ip();
+         current_shift=0;
+      }
+      current_shift=iBarShift(NULL,PERIOD_CURRENT,new_time1);
+      Print (" currnet shift= "+current_shift+" time= "+TimeToStr(Time[current_shift]));
+      ChartNavigate(0,CHART_END,-1*current_shift);
+
+   }
+   else if (pass_string == "num_5")
+   {
+      current_shift=0;
+      ChartNavigate(0,CHART_END,-1*current_shift);
+   }
+   else
+   {   Print ("unknown string entered= "+pass_string);
+       clear_ip();}
+}
+
+void clear_ip()
+{ip_string="";}
+void clear_current_shift()
+{current_shift=0;}
+
+datetime time_mod(datetime passed_time, char interval, string op)// find the reduced time after moving respective interval from current time 
+{
+   Print(TimeToStr(passed_time) );
+   datetime curr_time = passed_time;
+   datetime mod_time; int yr  = 3536000;int mo  = 2592000;int da = 86400;int ho = 3600;int we  = 604800;
+   
+   if(op == "add")
+   switch(int(interval))
+   {
+      case 72:
+        mod_time = curr_time + ho ; break;
+      case 68:
+        mod_time = curr_time + da ; break;
+      case 87:
+        mod_time = curr_time + we ; break;
+      case 77:
+        mod_time = curr_time + mo ; break;
+      case 89:
+        mod_time = curr_time + yr ; break;
+   }
+   else if(op == "sub")
+   switch(int(interval))
+   {
+      case 72:
+        mod_time = curr_time - ho ; break;
+      case 68:
+        mod_time = curr_time - da ; break;
+      case 87:
+        mod_time = curr_time - we ; break;
+      case 77:
+        mod_time = curr_time - mo ; break;
+      case 89:
+        mod_time = curr_time - yr ; break;
+   } 
+   
+   //datetime mod_time = StrToTime(StringFormat( "%04d.%02d.%02d %02d:%02d", yr, mo, da, ho, mi));
+   Print (TimeToStr((datetime)mod_time));
+   return mod_time;
+}
+
+void OnChartEvent(const int id,         // Event identifier  
+                  const long& lparam,   // Event parameter of long type
+                  const double& dparam, // Event parameter of double type
+                  const string& sparam) // Event parameter of string type
+  {
+   if(id==CHARTEVENT_CLICK)//--- the left mouse button has been pressed on the chart
+   {
+      int      x     =(int)lparam;
+      int      y     =(int)dparam;
+      datetime dt    =0;
+      double   price =0;
+      int      window=0;
+      //--- Convert the X and Y coordinates in terms of date/time
+      if(ChartXYToTimePrice(0,x,y,window,dt,price))
+      {
+         Print("The coordinates of the mouse click on the chart are: time = ",TimeToString(dt),"  price = ",price);
+         last_click[0]=dt;
+         last_click[1]=price;
+      }
+      else 
+      Print("Unable to convert XY to time-price");
+   }
+   
+   if(id==CHARTEVENT_OBJECT_CLICK)//--- the mouse has been clicked on the graphic object
+      Print("The mouse has been clicked on the object with name '"+sparam+"'");
+
+   if(id==CHARTEVENT_KEYDOWN)//--- the key has been pressed
+     {
+      switch(int(lparam))
+        {
+         case 38:  Print("num_up key pressed | "+ip_string); process_ipstring("num_up"); break; 
+         case 40:  Print("num_down key pressed | "+ip_string); process_ipstring("num_down"); break;  
+         case 37:  Print("num_left key pressed | "+ip_string); process_ipstring("num_left"); break; 
+         case 39:  Print("num_right key pressed | "+ip_string); process_ipstring("num_right"); break;
+         case 12:  Print("num_5 key pressed | "+ip_string); process_ipstring("num_5"); break;
+         case 9:   Print("TAB key pressed | "+ip_string); process_ipstring(ip_string);ip_string=""; break;
+         case 65:  StringAdd(ip_string,"A"); Print("A key pressed | "+ip_string); break;
+         case 66:  StringAdd(ip_string,"B"); Print("B key pressed | "+ip_string); break;
+         case 67:  StringAdd(ip_string,"C"); Print("C key pressed | "+ip_string); break;
+         case 68:  StringAdd(ip_string,"D"); Print("D key pressed | "+ip_string); break;
+         case 69:  StringAdd(ip_string,"E"); Print("E key pressed | "+ip_string); break;
+         case 70:  StringAdd(ip_string,"F"); Print("F key pressed | "+ip_string); break;
+         case 71:  StringAdd(ip_string,"G"); Print("G key pressed | "+ip_string); break;
+         case 72:  StringAdd(ip_string,"H"); Print("H key pressed | "+ip_string); break;
+         case 73:  StringAdd(ip_string,"I"); Print("I key pressed | "+ip_string); break;
+         case 74:  StringAdd(ip_string,"J"); Print("J key pressed | "+ip_string); break;
+         case 75:  StringAdd(ip_string,"K"); Print("K key pressed | "+ip_string); break;
+         case 76:  StringAdd(ip_string,"L"); Print("L key pressed | "+ip_string); break;
+         case 77:  StringAdd(ip_string,"M"); Print("M key pressed | "+ip_string); break;
+         case 78:  StringAdd(ip_string,"N"); Print("N key pressed | "+ip_string); break;
+         case 79:  StringAdd(ip_string,"O"); Print("O key pressed | "+ip_string); break;
+         case 80:  StringAdd(ip_string,"P"); Print("P key pressed | "+ip_string); break;
+         case 81:  StringAdd(ip_string,"Q"); Print("Q key pressed | "+ip_string); break;
+         case 82:  StringAdd(ip_string,"R"); Print("R key pressed | "+ip_string); break;
+         case 83:  StringAdd(ip_string,"S"); Print("S key pressed | "+ip_string); break;
+         case 84:  StringAdd(ip_string,"T"); Print("T key pressed | "+ip_string); break;
+         case 85:  StringAdd(ip_string,"U"); Print("U key pressed | "+ip_string); break;
+         case 86:  StringAdd(ip_string,"V"); Print("V key pressed | "+ip_string); break;
+         case 87:  StringAdd(ip_string,"W"); Print("W key pressed | "+ip_string); break;
+         case 88:  StringAdd(ip_string,"X"); Print("X key pressed | "+ip_string); break;
+         case 89:  StringAdd(ip_string,"Y"); Print("Y key pressed | "+ip_string); break;
+         case 90:  StringAdd(ip_string,"Z"); Print("Z key pressed | "+ip_string); break;
+         case 49:  StringAdd(ip_string,"1"); Print("1 key pressed | "+ip_string); break;
+         case 50:  StringAdd(ip_string,"2"); Print("2 key pressed | "+ip_string); break;
+         case 51:  StringAdd(ip_string,"3"); Print("3 key pressed | "+ip_string); break;
+         case 52:  StringAdd(ip_string,"4"); Print("4 key pressed | "+ip_string); break;
+         case 53:  StringAdd(ip_string,"5"); Print("5 key pressed | "+ip_string); break;
+         case 54:  StringAdd(ip_string,"6"); Print("6 key pressed | "+ip_string); break;
+         case 55:  StringAdd(ip_string,"7"); Print("7 key pressed | "+ip_string); break;
+         case 56:  StringAdd(ip_string,"8"); Print("8 key pressed | "+ip_string); break;
+         case 57:  StringAdd(ip_string,"9"); Print("9 key pressed | "+ip_string); break;
+         default:  Print("Some not listed key has been pressed"+int(lparam));
+        }
+      ChartRedraw();
+     }
+//--- the object has been deleted
+   if(id==CHARTEVENT_OBJECT_DELETE)
+     {
+      Print("The object with name ",sparam," has been deleted");
+     }
+//--- the object has been created
+   if(id==CHARTEVENT_OBJECT_CREATE)
+     {
+      Print("The object with name ",sparam," has been created");
+     }
+//--- the object has been moved or its anchor point coordinates has been changed
+   if(id==CHARTEVENT_OBJECT_DRAG)
+     {
+      Print("The anchor point coordinates of the object with name ",sparam," has been changed");
+     }
+//--- the text in the Edit of object has been changed
+   if(id==CHARTEVENT_OBJECT_ENDEDIT)
+     {
+      Print("The text in the Edit field of the object with name ",sparam," has been changed");
+     }
+  }
